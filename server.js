@@ -2,14 +2,16 @@ var http = require('http');
 var fs = require('fs');
 
 var myReadStream = fs.createReadStream(__dirname + '/read.txt', 'utf8');
+var myWriteStream = fs.createWriteStream(__dirname + '/writeMe.txt')
 
-myReadStream.on('data', function(chunk){
-    console.log('new chunk received', chunk.length)
-})
+myReadStream.pipe(myWriteStream);
 
 var server = http.createServer(function(req, res) {
     console.log('request was made: ' + req.url);
-    res.write('<h1>Hello Server</h1>');
+    res.writeHead(200, {'Content-Type': 'text/plain'});
+    var myReadStream = fs.createReadStream(__dirname + '/read.txt', 'utf8');
+    myReadStream.pipe(res);
+
 });
 
 server.listen(3000, '127.0.0.1');
